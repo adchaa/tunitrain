@@ -42,6 +42,16 @@ function App() {
         <ThemedText type="title">From Tunis</ThemedText>
         <Departure departure={tunisDeparture} />
       </ThemedView>
+      <ThemedView style={styles.legend}>
+        <ThemedText
+          style={styles.legendText}
+          lightColor="#687076"
+          darkColor="#9BA1A6"
+        >
+          A: every day except Sundays and holidays.{'\n'}
+          B: only on Sundays and holidays.
+        </ThemedText>
+      </ThemedView>
     </ThemedView>
   );
 }
@@ -56,6 +66,15 @@ const styles = StyleSheet.create({
   box: {
     alignItems: 'center',
     gap: 25,
+  },
+  legend: {
+    width: '90%',
+    alignItems: 'center',
+  },
+  legendText: {
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: 'center',
   },
   departure: {
     flexDirection: 'row',
