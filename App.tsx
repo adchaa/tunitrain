@@ -59,7 +59,7 @@ function App() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
     width: '100%',
     height: '100%',
   },
