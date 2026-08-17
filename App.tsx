@@ -68,7 +68,12 @@ const styles = StyleSheet.create({
     gap: 25,
   },
   legend: {
-    width: '90%',
+    position: 'absolute',
+    right: 0,
+    bottom: 24,
+    left: 0,
+    width: '100%',
+    paddingHorizontal: 20,
     alignItems: 'center',
   },
   legendText: {
