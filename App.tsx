@@ -7,13 +7,7 @@
 
 import { NewAppScreen } from '@react-native/new-app-screen';
 import { useEffect, useState } from 'react';
-import {
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
 import { ThemedView } from './components/ThemedView';
 import { ThemedText } from './components/ThemedText';
 import { from_bougatfa_to_tunis, from_tunis_to_bougatfa } from './timelines';
@@ -21,6 +15,15 @@ import { from_bougatfa_to_tunis, from_tunis_to_bougatfa } from './timelines';
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const bougatfaDeparture = getClosestDeparture(
+    currentDateTime,
+    from_bougatfa_to_tunis,
+  );
+  const tunisDeparture = getClosestDeparture(
+    currentDateTime,
+    from_tunis_to_bougatfa,
+  );
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentDateTime(new Date());
@@ -33,15 +36,11 @@ function App() {
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <ThemedView style={styles.box}>
         <ThemedText type="title">From bougatfa</ThemedText>
-        <ThemedText type="title">
-          {getClosestTime(currentDateTime, from_bougatfa_to_tunis)}
-        </ThemedText>
+        <Departure departure={bougatfaDeparture} />
       </ThemedView>
       <ThemedView style={styles.box}>
         <ThemedText type="title">From Tunis</ThemedText>
-        <ThemedText type="title">
-          {getClosestTime(currentDateTime, from_tunis_to_bougatfa)}
-        </ThemedText>
+        <Departure departure={tunisDeparture} />
       </ThemedView>
     </ThemedView>
   );
@@ -58,9 +57,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 25,
   },
+  departure: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  marker: {
+    minWidth: 42,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: '#0a7ea4',
+    color: '#fff',
+    fontSize: 22,
+    fontWeight: 'bold',
+    lineHeight: 28,
+    textAlign: 'center',
+  },
 });
 
-function getClosestTime(current: Date, timeline: string[]): string {
+type TrainMarker = 'A' | 'B' | null;
+
+type DepartureData = {
+  time: string;
+  marker: TrainMarker;
+};
+
+function Departure({ departure }: { departure: DepartureData }) {
+  return (
+    <View
+      style={styles.departure}
+      accessibilityLabel={`Departure at ${departure.time}${
+        departure.marker ? `, ${departure.marker}` : ''
+      }`}
+    >
+      <ThemedText type="title">{departure.time}</ThemedText>
+      {departure.marker && (
+        <ThemedText style={styles.marker}>{departure.marker}</ThemedText>
+      )}
+    </View>
+  );
+}
+
+function getClosestDeparture(current: Date, timeline: string[]): DepartureData {
   const currentTimeMs =
     current.getHours() * 60 * 60 * 1000 +
     current.getMinutes() * 60 * 1000 +
@@ -74,10 +113,22 @@ function getClosestTime(current: Date, timeline: string[]): string {
     const difference = timelineTimeMs - currentTimeMs;
 
     if (difference >= 0) {
-      return timeStr;
+      return { time: timeStr, marker: getMarker(i) };
     }
   }
-  return timeline[0];
+  return { time: timeline[0], marker: getMarker(0) };
+}
+
+function getMarker(index: number): TrainMarker {
+  if (index < 3) {
+    return null;
+  }
+
+  if (index > 53) {
+    return null;
+  }
+
+  return (['A', 'B', 'A', null] as const)[(index - 3) % 4];
 }
 
 export default App;
